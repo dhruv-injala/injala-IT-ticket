@@ -1,0 +1,21 @@
+{
+  "name": "injala-it-ticket-tool",
+  "version": "1.0.0",
+  "description": "IT Support Ticketing Web Application",
+  "main": "index.js",
+  "scripts": {
+    "install-all": "cd backend && npm install && cd ../frontend && npm install",
+    "start": "cd backend && npm start",
+    "start-frontend": "cd frontend && npm start",
+    "dev-backend": "cd backend && npm run dev",
+    "dev-frontend": "cd frontend && npm start"
+  },
+  "keywords": ["it", "ticket", "support", "react", "mongodb"],
+  "author": "",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": ""
+  }
+}
+
