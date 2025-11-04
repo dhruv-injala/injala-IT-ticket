@@ -59,6 +59,13 @@ function App() {
                 </Layout>
               </PrivateRoute>
             } />
+            <Route path="/audit-logs" element={
+              <PrivateRoute allowedRoles={['IT Admin']}>
+                <Layout>
+                  <AuditLogs />
+                </Layout>
+              </PrivateRoute>
+            } />
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
           <ToastContainer position="top-right" />

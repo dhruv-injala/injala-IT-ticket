@@ -4,6 +4,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
+import API_BASE_URL from '../config/api';
 
 const AdminDashboard = () => {
   const { user } = useAuth();
@@ -15,10 +16,25 @@ const AdminDashboard = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [statusFilter, setStatusFilter] = useState('');
   const [priorityFilter, setPriorityFilter] = useState('');
+  const [assigneeFilter, setAssigneeFilter] = useState('');
+  const [admins, setAdmins] = useState([]);
 
   useEffect(() => {
     fetchData();
   }, []);
+
+  useEffect(() => {
+    fetchAdmins();
+  }, []);
+
+  const fetchAdmins = async () => {
+    try {
+      const res = await axios.get(`${API_BASE_URL}/api/users`, { params: { role: 'IT Admin' } });
+      setAdmins(res.data);
+    } catch (e) {
+      // ignore
+    }
+  };
 
   const fetchData = async () => {
     try {
@@ -26,10 +42,11 @@ const AdminDashboard = () => {
       if (searchQuery) params.search = searchQuery;
       if (statusFilter) params.status = statusFilter;
       if (priorityFilter) params.priority = priorityFilter;
+      if (assigneeFilter) params.assignedTo = assigneeFilter;
 
       const [statsRes, ticketsRes] = await Promise.all([
-        axios.get('http://localhost:5000/api/users/stats/dashboard'),
-        axios.get('http://localhost:5000/api/tickets', { params })
+        axios.get(`${API_BASE_URL}/api/users/stats/dashboard`),
+        axios.get(`${API_BASE_URL}/api/tickets`, { params })
       ]);
 
       setStats(statsRes.data);
@@ -48,7 +65,7 @@ const AdminDashboard = () => {
       }
     }, 500);
     return () => clearTimeout(debounceTimer);
-  }, [searchQuery, statusFilter, priorityFilter]);
+  }, [searchQuery, statusFilter, priorityFilter, assigneeFilter]);
 
   // Real-time: refresh tickets list when a new ticket is created (admin only)
   useEffect(() => {
@@ -58,7 +75,7 @@ const AdminDashboard = () => {
     };
     socket.on('ticket:created', handler);
     return () => socket.off('ticket:created', handler);
-  }, [socket, user, searchQuery, statusFilter, priorityFilter]);
+  }, [socket, user, searchQuery, statusFilter, priorityFilter, assigneeFilter]);
 
   if (loading) {
     return (
@@ -178,7 +195,20 @@ const AdminDashboard = () => {
 
           {showFilters && (
             <div className="row g-3 mt-2">
-              <div className="col-12 col-md-6">
+              <div className="col-12 col-md-4">
+                <label className="form-label">Assignee</label>
+                <select
+                  className="form-select"
+                  value={assigneeFilter}
+                  onChange={(e) => setAssigneeFilter(e.target.value)}
+                >
+                  <option value="">All Assignees</option>
+                  {admins.map(a => (
+                    <option value={a._id} key={a._id}>{a.name} ({a.email})</option>
+                  ))}
+                </select>
+              </div>
+              <div className="col-12 col-md-4">
                 <label className="form-label">Status</label>
                 <select
                   className="form-select"
@@ -195,7 +225,7 @@ const AdminDashboard = () => {
                   <option value="Reopened">Reopened</option>
                 </select>
               </div>
-              <div className="col-12 col-md-6">
+              <div className="col-12 col-md-4">
                 <label className="form-label">Priority</label>
                 <select
                   className="form-select"

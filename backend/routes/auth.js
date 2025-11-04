@@ -8,7 +8,6 @@ const IT_ADMIN_PASSWORDS = {
   'sunil.marand@injala.com': 'Sunil@123',
   'siddhant.chavadiya@injala.com': 'Siddhant@123',
   'dhruv.vekariya@injala.com': 'Dhruv@123',
-  'jignesh.radadiya@injala.com': 'Jignesh@123',
 };
 const IT_ADMIN_WHITELIST = new Set(Object.keys(IT_ADMIN_PASSWORDS));
 const EMPLOYEE_PASSWORDS = {

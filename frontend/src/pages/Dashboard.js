@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import API_BASE_URL from '../config/api';
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -23,7 +24,7 @@ const Dashboard = () => {
 
   const fetchTickets = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/tickets');
+      const response = await axios.get(`${API_BASE_URL}/api/tickets`);
       setTickets(response.data.tickets);
       setCounts(response.data.counts);
     } catch (error) {

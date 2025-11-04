@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import API_BASE_URL from '../config/api';
 
 const CreateTicket = () => {
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ const CreateTicket = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:5000/api/tickets', formData);
+      const response = await axios.post(`${API_BASE_URL}/api/tickets`, formData);
       toast.success(`Ticket created successfully! Ticket Code: ${response.data.ticketCode}`);
       navigate(`/tickets/${response.data._id}`);
     } catch (error) {

@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useAuth } from '../context/AuthContext';
+import API_BASE_URL from '../config/api';
 
 const TicketDetail = () => {
   const { id } = useParams();
@@ -24,7 +25,7 @@ const TicketDetail = () => {
 
   const fetchTicketData = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/tickets/${id}`);
+      const response = await axios.get(`${API_BASE_URL}/api/tickets/${id}`);
       setTicket(response.data.ticket);
       setComments(response.data.comments);
       setAttachments(response.data.attachments);
@@ -37,7 +38,7 @@ const TicketDetail = () => {
 
   const fetchAdmins = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/users', { params: { role: 'IT Admin' } });
+      const res = await axios.get(`${API_BASE_URL}/api/users`, { params: { role: 'IT Admin' } });
       setAdmins(res.data);
     } catch (e) {
       // ignore silently for UI
@@ -50,7 +51,7 @@ const TicketDetail = () => {
 
     setSubmitting(true);
     try {
-      const response = await axios.post('http://localhost:5000/api/comments', {
+      const response = await axios.post(`${API_BASE_URL}/api/comments`, {
         ticket: id,
         comment: commentText,
         isInternal
@@ -69,7 +70,7 @@ const TicketDetail = () => {
 
   const handleStatusChange = async (newStatus) => {
     try {
-      const response = await axios.put(`http://localhost:5000/api/tickets/${id}`, {
+      const response = await axios.put(`${API_BASE_URL}/api/tickets/${id}`, {
         status: newStatus
       });
       setTicket(response.data);
@@ -81,7 +82,7 @@ const TicketDetail = () => {
 
   const handleReassign = async (newAssignee) => {
     try {
-      const response = await axios.patch(`http://localhost:5000/api/tickets/${id}/reassign`, {
+      const response = await axios.patch(`${API_BASE_URL}/api/tickets/${id}/reassign`, {
         assignedTo: newAssignee
       });
       setTicket(response.data);
@@ -100,7 +101,7 @@ const TicketDetail = () => {
     formData.append('ticket', id);
 
     try {
-      const response = await axios.post('http://localhost:5000/api/attachments/upload', formData, {
+      const response = await axios.post(`${API_BASE_URL}/api/attachments/upload`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       setAttachments([response.data, ...attachments]);
@@ -167,7 +168,7 @@ const TicketDetail = () => {
                       {att.filename}
                     </span>
                     <a 
-                      href={`http://localhost:5000/api/attachments/${att._id}/download`}
+                      href={`${API_BASE_URL}/api/attachments/${att._id}/download`}
                       className="btn btn-sm btn-outline-primary"
                       target="_blank"
                       rel="noopener noreferrer"

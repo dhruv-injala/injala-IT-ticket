@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import API_BASE_URL from '../config/api';
 
 const MyTickets = () => {
   const [tickets, setTickets] = useState([]);
@@ -18,7 +19,7 @@ const MyTickets = () => {
       if (filter !== 'all') {
         params.status = filter;
       }
-      const response = await axios.get('http://localhost:5000/api/tickets', { params });
+      const response = await axios.get(`${API_BASE_URL}/api/tickets`, { params });
       setTickets(response.data.tickets);
     } catch (error) {
       toast.error('Error fetching tickets');

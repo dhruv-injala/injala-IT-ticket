@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import API_BASE_URL from '../config/api';
 
 const NotificationCenter = () => {
   const { user } = useAuth();
@@ -20,7 +21,7 @@ const NotificationCenter = () => {
 
   const fetchNotifications = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/notifications');
+      const response = await axios.get(`${API_BASE_URL}/api/notifications`);
       setNotifications(response.data.notifications);
       setUnreadCount(response.data.unreadCount);
     } catch (error) {
@@ -30,7 +31,7 @@ const NotificationCenter = () => {
 
   const markAsRead = async (notificationId) => {
     try {
-      await axios.patch(`http://localhost:5000/api/notifications/${notificationId}/read`);
+      await axios.patch(`${API_BASE_URL}/api/notifications/${notificationId}/read`);
       setNotifications(notifications.map(n => 
         n._id === notificationId ? { ...n, isRead: true } : n
       ));
@@ -42,7 +43,7 @@ const NotificationCenter = () => {
 
   const markAllAsRead = async () => {
     try {
-      await axios.patch('http://localhost:5000/api/notifications/read-all');
+      await axios.patch(`${API_BASE_URL}/api/notifications/read-all`);
       setNotifications(notifications.map(n => ({ ...n, isRead: true })));
       setUnreadCount(0);
     } catch (error) {

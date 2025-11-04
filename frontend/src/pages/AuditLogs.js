@@ -1,35 +1,56 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import API_BASE_URL from '../config/api';
+import { useAuth } from '../context/AuthContext';
 
 const AuditLogs = () => {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { loading: authLoading } = useAuth();
   const [filters, setFilters] = useState({
     action: '',
     user: '',
     startDate: '',
-    endDate: ''
+    endDate: '',
+    limit: '500'
   });
+  const [users, setUsers] = useState([]);
 
-  useEffect(() => {
-    fetchLogs();
-  }, [filters]);
-
-  const fetchLogs = async () => {
+  const fetchLogs = useCallback(async () => {
     try {
       const params = {};
       if (filters.action) params.action = filters.action;
       if (filters.user) params.user = filters.user;
       if (filters.startDate) params.startDate = filters.startDate;
       if (filters.endDate) params.endDate = filters.endDate;
+      if (filters.limit) params.limit = filters.limit;
 
-      const response = await axios.get('http://localhost:5000/api/audit', { params });
+      const response = await axios.get(`${API_BASE_URL}/api/audit`, { params });
       setLogs(response.data);
     } catch (error) {
       toast.error('Error fetching audit logs');
     } finally {
       setLoading(false);
+    }
+  }, [filters]);
+
+  useEffect(() => {
+    if (authLoading) return;
+    setLoading(true);
+    fetchLogs();
+  }, [fetchLogs, authLoading]);
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const fetchUsers = async () => {
+    try {
+      const res = await axios.get(`${API_BASE_URL}/api/users`);
+      setUsers(res.data);
+    } catch (e) {
+      // ignore selector load failure
     }
   };
 
@@ -66,6 +87,19 @@ const AuditLogs = () => {
               />
             </div>
             <div className="col-md-3">
+              <label className="form-label">User</label>
+              <select
+                className="form-select"
+                value={filters.user}
+                onChange={(e) => setFilters({ ...filters, user: e.target.value })}
+              >
+                <option value="">All Users</option>
+                {users.map(u => (
+                  <option key={u._id} value={u._id}>{u.name} ({u.email})</option>
+                ))}
+              </select>
+            </div>
+            <div className="col-md-3">
               <label className="form-label">Start Date</label>
               <input
                 type="date"
@@ -83,11 +117,24 @@ const AuditLogs = () => {
                 onChange={(e) => setFilters({ ...filters, endDate: e.target.value })}
               />
             </div>
+            <div className="col-md-2 mt-3">
+              <label className="form-label">Limit</label>
+              <select
+                className="form-select"
+                value={filters.limit}
+                onChange={(e) => setFilters({ ...filters, limit: e.target.value })}
+              >
+                <option value="100">100</option>
+                <option value="200">200</option>
+                <option value="500">500</option>
+                <option value="1000">1000</option>
+              </select>
+            </div>
             <div className="col-md-3">
               <label className="form-label">&nbsp;</label>
               <button
                 className="btn btn-secondary w-100"
-                onClick={() => setFilters({ action: '', user: '', startDate: '', endDate: '' })}
+                onClick={() => setFilters({ action: '', user: '', startDate: '', endDate: '', limit: '500' })}
               >
                 Clear Filters
               </button>
